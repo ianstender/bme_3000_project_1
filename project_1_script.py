@@ -80,29 +80,45 @@ check_size(normal_trials,'Arrythmic Trials', trial_size)
 
 
 # plot one normal trial and one arrhythmic trial
-plt.plot(trial_time,normal_trials[10], label = 'normal trial')
-plt.plot(trial_time,arrhythmic_trials[10], label = 'arrhythmic trial')
+plt.plot(trial_time,normal_trials[10], label = 'Normal Trial')
+plt.plot(trial_time,arrhythmic_trials[10], label = 'Arrhythmic Trial')
 plt.xlabel('Time (s)')
-plt.ylabel('V')
+plt.ylabel('Voltage (Volts)')
 plt.title('Normal trial vs. Arrhythmic Trial')
 plt.grid()
 plt.legend()
 
+
+
+
+
 # %% Plot Trial Means
 
+
 file_name = 'ecg_e0103_half1.npz'
-ecg_voltage,fs,label_samples,label_symbols,subject_id,electrode,units,ecg_time = module.load_data(file_name)
 
 
-units = 'A.U.'
-title = 'Plot Trial Means'
+title = 'Plot Trial Means and Standard Deviation'
 trial_duration_seconds = 1
 
 
-trial_means, trial_stds = module.plot_mean_and_std_trials(ecg_voltage, label_samples, label_symbols, trial_duration_seconds, fs, units, title)
+symbols, trial_time, mean_trial_signal = module.plot_mean_and_std_trials(ecg_voltage, label_samples, label_symbols, trial_duration_seconds, fs, units, title)
 
-norm_t = trial_means['N']
-v_t = trial_means['V']
 
-norm_s = trial_stds['N']
-v_s = trial_stds['V']
+# %% Save files
+
+saved_filename = f'ecg_means_{subject_id}.npz'
+
+module.save_means(symbols, trial_time, mean_trial_signal, saved_filename)
+
+test_data = np.load(saved_filename)
+
+if np.array_equal(test_data['symbols'],symbols):
+    print('Symbols data correctly saved')
+    
+if np.array_equal(test_data['trial_time'],trial_time):
+    print('Trial_time data correctly saved')
+    
+if np.array_equal(test_data['mean_trial_signal'], mean_trial_signal):
+    print('mean_trial_signal data correctly saved')
+    

@@ -30,9 +30,9 @@ def load_data(input_file):
 # %% Part 2: Plot Raw Data
     
 def plot_raw_data(signal_voltage, signal_time, units = 'V', title = ''):
-    plt.plot(signal_time,signal_voltage, label='signal')
+    plt.plot(signal_time,signal_voltage, label='Signal')
     plt.xlabel('Time (s)')
-    plt.ylabel(units)
+    plt.ylabel(f'Signal Voltage ({units})')
     plt.title(title)
     plt.grid()
     plt.legend()
@@ -75,17 +75,22 @@ def extract_trials(signal_voltage, trial_start_samples, trial_sample_count):
 
 # %% Part 5: Plot Trial Means
 
-def plot_mean_and_std_trials(signal_voltage,label_samples,label_symbols,trial_duration_seconds,fs,units,title):
+def plot_mean_and_std_trials(signal_voltage,label_samples,label_symbols,trial_duration_seconds,fs,units = 'V',title = ''):
     
-    symbols = list(np.unique(label_symbols))
     
+
+
+    symbols = np.array(np.unique(label_symbols))
     plt.figure('Wrapper Function', clear = True)
     
-
+    
 
     
-    trial_means = {}
-    trial_stds = {}
+    # trial_means = {}
+    # trial_stds = {}
+    mean_row_count = 0
+    
+    mean_trial_signal = np.empty((len(symbols),int(fs*(trial_duration_seconds))))
     
     for trial_type in symbols:
         
@@ -100,17 +105,29 @@ def plot_mean_and_std_trials(signal_voltage,label_samples,label_symbols,trial_du
         trial_mean = np.nanmean(trial,0)
         trial_std = np.nanstd(trial,0)
         
-        trial_means[trial_type] = trial_mean
-        trial_stds[trial_type] = trial_std
+        # trial_means[trial_type] = trial_mean
+        # trial_stds[trial_type] = trial_std
+                
+        trial_time = np.arange(-trial_sample_count*(1/fs)/2,trial_sample_count*(1/fs)/2,(1/fs))
         
-        trial_time = np.arange(0,trial_sample_count*(1/fs),(1/fs))
         plt.plot(trial_time,trial_mean, label = f'{trial_type} mean', linewidth = 2,)
-        plt.fill_between(trial_time, y1 = -trial_std, y2 = trial_std, alpha = .4)
-        plt.grid()
-        plt.legend()
-        
+        plt.fill_between(trial_time, y1 = trial_mean-trial_std, y2 = trial_mean+trial_std, alpha = .4, label = f'{trial_type} mean +/- std')
+
+        mean_trial_signal[mean_row_count] = trial_mean
+        mean_row_count += 1
     
-    return trial_means,trial_stds
+    plt.xlabel('Time (s)')
+    plt.ylabel(f'Voltage ({units})')
+    plt.title(title)
+    plt.legend()
+    plt.grid()
+    
+    return symbols, trial_time, mean_trial_signal
+        
     
   
 
+# %% Part 6: Save the Arrays and Plots
+
+def save_means(symbols, trial_time, mean_trial_signal, out_filename = 'ecg_means.npz'):
+    np.savez(out_filename,symbols = symbols, trial_time = trial_time, mean_trial_signal = mean_trial_signal)
