@@ -87,3 +87,22 @@ plt.ylabel('V')
 plt.title('Normal trial vs. Arrhythmic Trial')
 plt.grid()
 plt.legend()
+
+# %% Plot Trial Means
+
+file_name = 'ecg_e0103_half1.npz'
+ecg_voltage,fs,label_samples,label_symbols,subject_id,electrode,units,ecg_time = module.load_data(file_name)
+
+
+units = 'A.U.'
+title = 'Plot Trial Means'
+trial_duration_seconds = 1
+
+
+trial_means, trial_stds = module.plot_mean_and_std_trials(ecg_voltage, label_samples, label_symbols, trial_duration_seconds, fs, units, title)
+
+norm_t = trial_means['N']
+v_t = trial_means['V']
+
+norm_s = trial_stds['N']
+v_s = trial_stds['V']
