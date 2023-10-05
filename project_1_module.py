@@ -3,9 +3,9 @@
 """
 Created on Tue Sep 26 11:03:30 2023
 
-Module containing several functions used to load, manipulate, and graph data
+Module containing several functions used to load, manipulate, and graph ecg voltage data.
 
-@author: ianstender
+@authors: ianstender and jacksonmontour
 """
 import numpy as np
 from matplotlib import pyplot as plt
@@ -26,22 +26,22 @@ def load_data(input_file):
 
     Returns
     -------
-    ecg_voltage : array
-        A 1D array of all voltages sampled in trial.
-    fs : array
-        A 1D array of the sampling frequency in Hz.
-    label_samples : array
-        A 1D array listing the time indexes when events occur.
-    label_symbols : array
-        A 1D array indicating the symbol of each event.
-    subject_id : array
-        A 1D array of the subject's id.
-    electrode : array
-        A 1D array saying which elecrode's data was used in the data set.
-    units : array
-        Units electrode measured in.
-    ecg_time : array
-        A 1D array for time elapsed throughout trial.
+    ecg_voltage : array of floats
+        A 1D array of all voltages sampled in trial of length n = amount of times voltage was sampled.
+    fs : array of int
+        A 1D array of the sampling frequency in Hz of length, length = 1.
+    label_samples : array of ints
+        A 1D array listing the time indexes when events occur of length n = amount of times voltage was sampled.
+    label_symbols : array of strings
+        A 1D array indicating the symbol of each event, length n = amount of events in signal.
+    subject_id : array of string
+        A 1D array of the subject's id, length = 1
+    electrode : array of string
+        A 1D array saying which elecrode's data was used in the data set, length = 1
+    units : array of string
+        Units electrode measured in, length = 1
+    ecg_time : array of floats
+        A 1D array for time elapsed throughout trial, length n = amount of times voltage was sampled.
 
     """
     data = np.load(input_file)
@@ -55,24 +55,6 @@ def load_data(input_file):
     units = data['units']
     ecg_time = np.arange(0,len(ecg_voltage)*(1/fs),(1/fs))
     
-    '''
-    print(f'{type(ecg_voltage)}')
-    print(f'{ecg_voltage}')
-    print(f'{type(fs)}')
-    print(f'{fs}')
-    print(f'{type(label_samples)}')
-    print(f'{label_samples}')
-    print(f'{type(label_symbols)}')
-    print(f'{label_symbols}')
-    print(f'{type(subject_id)}')
-    print(f'{subject_id}')
-    print(f'{type(electrode)}')
-    print(f'{electrode}')
-    print(f'{type(units)}')
-    print(f'{units}')
-    print(f'{type(ecg_time)}')
-    print(f'{ecg_time}')
-    '''
 
     return ecg_voltage,fs,label_samples,label_symbols,subject_id,electrode,units, ecg_time
 
@@ -84,10 +66,10 @@ def plot_raw_data(signal_voltage, signal_time, units = 'V', title = ''):
 
     Parameters
     ----------
-    signal_voltage : array
-        A 1D array of voltages of the signal throughout the entire trial.
-    signal_time : array
-        A 1D array of elapsing time during signal.
+    signal_voltage : array of floats
+        A 1D array of voltages of the signal throughout the entire trial, length n = amount of times voltage was sampled.
+    signal_time : array of floats
+        A 1D array of elapsing time during signal, length n = amount of times voltage was sampled.
     units : string, optional
         A string representing the unit that voltage was measured in. The default is 'V'.
     title : string, optional
@@ -113,14 +95,14 @@ def plot_events(label_samples, label_symbols, signal_time, signal_voltage):
 
     Parameters
     ----------
-    label_samples : array
-        A 1D array of all the time values where an event occurs.
-    label_symbols : array
-        A 1D array listing the symbol of each event in chronological order.
-    signal_time : array
-        A 1D array of elapsing time during the signal.
-    signal_voltage : array
-        A 1D array of full set of sampled ecg voltage data.
+    label_samples : array of ints
+        A 1D array of all the time values where an event occurs, length n = amount of events recorded.
+    label_symbols : array of strings
+        A 1D array listing the symbol of each event in chronological order, length n = amount of events recorded.
+    signal_time : array of floats
+        A 1D array of elapsing time during the signal, length n = amount of times voltage was sampled.
+    signal_voltage : array of floats
+        A 1D array of full set of sampled ecg voltage data, length n = amount of times voltage was sampled.
 
     Returns
     -------
@@ -142,17 +124,17 @@ def extract_trials(signal_voltage, trial_start_samples, trial_sample_count):
 
     Parameters
     ----------
-    signal_voltage : array
-        A 1D array of voltages of the signal throughout the entire trial.
-    trial_start_samples : array
-        A 1D array of the times each event occurs.
-    trial_sample_count : array
-        A 1D array of the total number of samples.
+    signal_voltage : array of floats
+        A 1D array of voltages of the signal throughout the entire trial, length n = amount of times voltage was sampled.
+    trial_start_samples : array of ints
+        A 1D array of the times each event occurs, length n = number of events matching a specific symbol i.e. 'N'.
+    trial_sample_count : array of int
+        A 1D array of the total number of samples, length n = number of events matching a specific symbole i.e. 'N'.
 
     Returns
     -------
-    trials : array
-        A 2D array where rows represent each individual sample and columns represent the voltages of each sample.
+    trials : array of floats
+        A 2D array where rows represent each individual sample and columns represent the voltages of each sample, width w = number of times voltage was sampled in every event, length n = number of evemts matching a certain symbol.
 
     """
     # Initialize an empty 2D array to store trials
@@ -188,16 +170,16 @@ def plot_mean_and_std_trials(signal_voltage,label_samples,label_symbols,trial_du
 
     Parameters
     ----------
-    signal_voltage : array
-        A 1D array of voltages of the signal throughout the entire trial.
-    label_samples : array
-        A 1D array of all the time values where an event occurs.
-    label_symbols : array
-        A 1D array indicating the symbol of each event.
+    signal_voltage : array of floats
+        A 1D array of voltages of the signal throughout the entire trial, length n = amount of times voltage was sampled.
+    label_samples : array of ints
+        A 1D array of all the time values where an event occurs, length n = amount of events recorded.
+    label_symbols : array of strings
+        A 1D array indicating the symbol of each event, length n = amount of events recorded.
     trial_duration_seconds : int
         A number representing the time in seconds that each trial lasts.
     fs : array
-        A 1D array of the sampling frequency in Hz.
+        A 1D array of the sampling frequency in Hz, length = 1
     units : string, optional
         A string representing the unit that voltage was measured in. The default is 'V'.
     title : string, optional
@@ -205,12 +187,12 @@ def plot_mean_and_std_trials(signal_voltage,label_samples,label_symbols,trial_du
 
     Returns
     -------
-    symbols : array
-        A 1D array containing a string for each symbol.
-    trial_time : array
-        A 1D array of time values during a trial.
-    mean_trial_signal : array
-        A 1D array of the mean voltages of each trial.
+    symbols : array of strings
+        A 1D array containing a string for each symbol, kength n = amount of unique symbols.
+    trial_time : array of floats
+        A 1D array of time values during a trial, length n = amount of times voltage was sampled during each event.
+    mean_trial_signal : array of floats
+        A 1D array of the mean voltages of each trial, length n = amount of times voltage was sampled during each event.
 
     """
     
@@ -266,12 +248,12 @@ def save_means(symbols, trial_time, mean_trial_signal, out_filename = 'ecg_means
 
     Parameters
     ----------
-    symbols : array
-        A 1D array containing a string for each symbol.
-    trial_time : array
-        A 1D array of elapsing time for the signal.
-    mean_trial_signal : array
-        A 1D array of voltages for mean trial's signal.
+    symbols : array of strings
+        A 1D array containing a string for each symbol, length n = amount of unique symbols.
+    trial_time : array of floats
+        A 1D array of elapsing time for the signal, length n = amount of times voltage was sampled during each event.
+    mean_trial_signal : array or floats
+        A 1D array of voltages for mean trial's signal, length n = amount of times voltsge was sampled during each event.
     out_filename : string, optional
         This string is used as the file name when it is saved. The default is 'ecg_means.npz'.
 
